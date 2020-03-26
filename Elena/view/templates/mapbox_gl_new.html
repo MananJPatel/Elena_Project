@@ -1,0 +1,356 @@
+<!-- templates/mapbox_gl.html -->
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <title></title>
+        <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.29.0/mapbox-gl.css' rel='stylesheet' />
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.simpleWeather/3.1.0/jquery.simpleWeather.min.js'></script>
+        <link rel= "stylesheet" type= "text/css" href= "styles/button-style.css">
+        <link rel= "stylesheet" type= "text/css" href= "styles/text_styles.css">
+        <style>
+            body { margin:0; padding:0; }
+            #wrapper { position:absolute; top:0; bottom:0; width:100%; }
+            #map { position:relative; width:100%; height: 100%;}
+            .info {
+                display: block;
+                position: relative;
+                margin: 0px auto;
+                border: none;
+                border-radius: 3px;                
+                color: #222;
+                
+            } 
+            .sidenav {
+                height: 100%;
+                width: 400px;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                background-color:#f4f4f4;
+                overflow-x: hidden;
+                padding-top: 20px;
+                
+            } 
+            
+            .msg {
+                /* display: block; */
+                position: relative;
+                margin: 0px auto;
+                border: none;
+                border-radius: 3px;                
+                color: #222;
+                
+            }   
+            .button {
+                position: relative;;
+                background-color: grey; /* Green */
+                border: none;
+                color: whitesmoke;
+                padding: 15px 32px;
+                text-align: center;
+                
+                
+            } 
+            .button:active:enabled {
+                background-color: #3a3a42;
+                box-shadow: 0 5px #666;
+                transform: translateY(4px);
+            }
+            .button:hover:enabled {background-color: darkgray}
+            .marker {
+                background-image: url('/marker-15.svg');
+                background-size: cover;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                cursor: pointer;
+            } 
+            #loading {
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                position: fixed;
+                display: block;
+                opacity: 0.7;
+                background-color: #fff;
+                z-index: 99;
+                text-align: center;
+            }    
+            #loading-image {
+                z-index: 100;
+                position: fixed; /* or absolute */
+                top: 50%;
+                left: 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="map"></div>
+        </div>
+        <div class="sidenav">
+            <img id="logo" src= "/elenav.png" alt="Logo" style="width:100%" />
+            
+            <div id="weather" class="text-subhead"></div>
+            <div id='info'></div>
+            <div id="start" class="text-subhead"> Start Location : 0  </div> 
+            <div id="end" class="text-subhead"> End Location : 0  </div> 
+            <div id="check_box" class="text-subhead"> 
+                <input type="checkbox" name="skill" class="check" value="minimize" checked> Minimize Elevation
+                <input type="checkbox" name="skill" class="check" value="maximize"> Maximize Elevation
+            </div> 
+            <div id="check_box" class="text-subhead" style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+            <label for="threshold" class="text-subhead">Path limit : x% of the shortest path &nbsp;&nbsp;</label>
+            <input type="number" id="x" min="0" name="threshold" class="text-subhead" 0 value=0 style="width: 80px;">   <br />
+            </div>
+            <button id="reset" class="pure-material-button-contained">Reset</button>
+            <button id="calc_route" class="pure-material-button-contained" disabled>Click start location.</button>
+            <div id="ele_stats" class="text-subhead"> Elevation Statistics:  </div>             
+        </div>
+        
+        <div id="loading">
+            <img id="loading-image" src= "/ajax-loader.gif" alt="Loading..." />
+        </div>
+        
+        <script>
+            var start_flag=false;
+            var end_flag=false;
+            var start_loc="";
+            var end_loc="";
+            var minimize_elevation=true;
+            $(document).ready(function(){
+                $('.check').click(function() {
+                    $('.check').not(this).prop('checked', false);
+                });
+            });
+
+            mapboxgl.accessToken = '{{ ACCESS_KEY }}';
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v9',
+                center: [-72.529262, 42.384803],
+                zoom: 12,
+            });
+            map.addControl(new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true
+            }));
+            var m1, m2;
+            points = turf.featureCollection([]);
+            
+            map.on("load" , () => {
+                $('#loading').hide();
+                // add data source to hold our data we want to display
+                map.addSource('circleData', {
+                    type: 'geojson',
+                    data: {
+                    type: 'FeatureCollection',
+                    features: [],
+                    },
+                });
+
+                map.addLayer({
+                    id: 'data',
+                    type: 'circle',
+                    source: 'circleData',
+                    paint: {
+                    'circle-opacity' : 0.1,
+                    'circle-radius': 300,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#333',
+                    },
+                });
+            }
+            );
+            map.on('mousemove', function (e) {
+                
+                document.getElementById('info').innerHTML = 
+                '<br />' +                   
+                    "Latitude: "+e.lngLat["lat"].toFixed(4)+ ' | ' +
+                    "Longitude: "+e.lngLat["lng"].toFixed(4)+'<br />' ;
+                    
+                    
+                
+            });
+            
+            map.on('click', function(e) {
+
+                lngLat = new Array(e.lngLat.lng, e.lngLat.lat);
+
+                console.log(JSON.stringify(e.lngLat))
+                if (!start_flag)
+                {
+                    document.getElementById('start').innerHTML ="Start Location:("+Math.round(e.lngLat["lat"] * 10000)/10000+","+Math.round(e.lngLat["lng"] * 10000)/10000+")";
+                    start_loc=JSON.stringify(e.lngLat);
+                    start_flag=true;
+                    var el = document.createElement('div');
+                    el.className = 'marker';
+                    m1 = new mapboxgl.Marker(el, {offset: [-20 / 2, -20]})
+                    .setLngLat(e.lngLat)
+                    .addTo(map);
+                    map.flyTo({center: lngLat});
+                                        
+                    document.getElementById('calc_route').innerHTML ="Click end location."
+                }
+                else if(!end_flag )
+                {
+                    document.getElementById('end').innerHTML ="End Location:("+Math.round(e.lngLat["lat"] * 10000)/10000+","+Math.round(e.lngLat["lng"] * 10000)/10000+")";
+                    end_loc=JSON.stringify(e.lngLat);
+                    var el = document.createElement('div');
+                    el.className = 'marker';
+                    m2 = new mapboxgl.Marker(el, {offset: [-20 / 2, -20]})
+                    .setLngLat(e.lngLat)
+                    .addTo(map);
+                    end_flag=true;
+                    document.getElementById("calc_route").disabled = false;
+                    document.getElementById('calc_route').innerHTML ="Calculate Route"
+                }
+            });
+            
+            function reset()
+            {
+                document.getElementById('start').innerHTML ="Start Location : 0";
+                document.getElementById('end').innerHTML ="End Location : 0";
+                document.getElementById('calc_route').innerHTML ="Click start location."
+                document.getElementById("calc_route").disabled = true;
+                start_loc="";
+                start_flag=false;
+                end_loc="";
+                m1.remove();
+                m2.remove();
+                end_flag=false;
+                points = turf.featureCollection([]);
+                map.getSource('circleData').setData(points);
+                if (map.getLayer("shortest_route")){
+                    map.removeLayer("shortest_route");
+                }
+
+                if (map.getSource("shortest_route")){
+                    map.removeSource("shortest_route");
+                }
+                if (map.getLayer("ele_route")){
+                    map.removeLayer("ele_route");
+                }
+
+                if (map.getSource("ele_route")){
+                    map.removeSource("ele_route");
+                }
+  
+                document.getElementById('ele_stats').innerHTML="Elevation Statistics:";
+
+            }
+            function calc_route_reset()
+            {
+                
+                if (map.getLayer("shortest_route")){
+                    map.removeLayer("shortest_route");
+                }
+
+                if (map.getSource("shortest_route")){
+                    map.removeSource("shortest_route");
+                }
+                if (map.getLayer("ele_route")){
+                    map.removeLayer("ele_route");
+                }
+
+                if (map.getSource("ele_route")){
+                    map.removeSource("ele_route");
+                }
+ 
+                document.getElementById('ele_stats').innerHTML="Elevation Statistics:";
+
+            }
+            document.getElementById('reset').onclick=reset;
+            function handleData(data)
+            {   
+                if (data["popup_flag"]==0)  
+                {
+                    var temp=confirm("Selected locations do not have neighboring nodes in underlying graph.Please select different points.");
+                    return; print(elevation_profile_elenav)
+                }  
+                console.log(data["popup_flag"])
+                if (data["popup_flag"]==1)  
+                {
+                    var temp=confirm("Could not find a path optimizing elevation for the given threshold (Plotting just the shortest path.).");
+                    
+                }                                        
+                
+                map.addSource("ele_route", {
+                    "type": "geojson",
+                    "data": data["elevation_route"]
+                });
+
+                map.addLayer({
+                    "id": "ele_route",
+                    "type": "line",
+                    "source": "ele_route",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "#B01F00",
+                        "line-width": 2
+                    }
+                });
+                
+                map.addSource("shortest_route", {
+                    "type": "geojson",
+                    "data": data["shortest_route"]
+                });
+
+                map.addLayer({
+                    "id": "shortest_route",
+                    "type": "line",
+                    "source": "shortest_route",
+                    "layout": {
+                        "line-join": "round",
+                        "line-cap": "round"
+                    },
+                    "paint": {
+                        "line-color": "Blue",
+                        "line-width": 2
+                    }
+                });
+                console.log("Routes Drawn"); 
+                document.getElementById('ele_stats').innerHTML= "Elena:"+ ' | ' +
+                                                                "Gain: "+data["gainElenav"].toFixed(2) + 'm | ' +
+                                                                "Drop: "+data["dropElenav"].toFixed(2)+'m | ' + 
+                                                                "Dist: "+data["elenavDist"].toFixed(2) +'m<br/>' + 
+                                                                "Shor. :"+ ' | ' +
+                                                                "Gain: "+data["gainShort"].toFixed(2) + 'm | ' +
+                                                                "Drop: "+data["dropShort"].toFixed(2)+'m | ' +
+                                                                "Dist: "+data["shortDist"].toFixed(2) +'m';
+            }
+
+            document.getElementById('calc_route').onclick=function(){                
+                var checkedValue = $('.check:checked').val();  
+                console.log(document.getElementById('x').value) ;             
+                var input_data='{"start_location":'+start_loc+',"x":'+document.getElementById('x').value+',"end_location":'+end_loc+',"min_max":"'+checkedValue.toString()+'"}';                
+                
+                $('#loading').show();
+                calc_route_reset();
+                $.ajax({
+                    type: "POST",
+                    url: '/route',
+                    data: input_data,
+                    success: function(data){
+                        $('#loading').hide();
+                        console.log("POST SUCCESS");                         
+                        handleData(data);                        
+                    },
+                    dataType: "json"
+                });
+            };
+        </script>
+        
+    </body>
+</html>
