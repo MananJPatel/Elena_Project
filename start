@@ -1,0 +1,6 @@
+#!/bin/bash
+# export MPLBACKEND=TkAgg
+export FLASK_APP=Elena/controller/server.py
+export FLASK_DEBUG=1
+export APP_CONFIG_FILE=settings.py
+python -m flask run

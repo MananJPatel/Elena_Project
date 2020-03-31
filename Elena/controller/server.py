@@ -3,6 +3,7 @@ from flask import Flask, request, session, g, redirect, \
     url_for, abort, render_template, flash,jsonify
 import requests
 import json
+from Elena.controller.algorithms import Algorithms
 from Elena.model.graph_model import Model
 
 
@@ -33,7 +34,7 @@ def create_data(start_location, end_location, x, min_max):
     """
     Prepares the data for the routes to be plotted. 
     """
-    global init, G, M
+    global init, G, M, algorithms
     print("Start: ",start_location)
     print("End: ",end_location)
     print("Percent of Total path: ",x)
@@ -41,16 +42,26 @@ def create_data(start_location, end_location, x, min_max):
     if not init:
         M = Model()
         G = M.get_graph(start_location, end_location)
+        algorithms = Algorithms(G, x = x, mode = min_max)
         init = True
-        
-    data = {"elevation_route" : [] , "shortest_route" : []}        
-    data["shortDist"] = 0
-    data["gainShort"] = 0
-    data["dropShort"] = 0
-    data["elenavDist"]  = 0
-    data["gainElenav"] = 0
-    data["dropElenav"] = 0
-    data["popup_flag"] = 0 
+    
+    shortestPath = algorithms.shortest_path(start_location, end_location, x, mode = min_max,log=True)   
+    
+    if shortestPath is None:
+        data = {"elevation_route" : [] , "shortest_route" : []}        
+        data["shortDist"] = 0
+        data["gainShort"] = 0
+        data["dropShort"] = 0
+        data["elenavDist"]  = 0
+        data["gainElenav"] = 0
+        data["dropElenav"] = 0
+        data["popup_flag"] = 0 
+        return data
+    data = {"shortest_route" : create_geojson(shortestPath[0])}
+    data["shortDist"] = shortestPath[1]
+    data["gainShort"] = shortestPath[2]
+    data["dropShort"] = shortestPath[3]  
+    data["popup_flag"] = 2    
     return data
     
 @app.route('/mapbox_gl_new')
