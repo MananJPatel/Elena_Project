@@ -3,6 +3,8 @@ from flask import Flask, request, session, g, redirect, \
     url_for, abort, render_template, flash,jsonify
 import requests
 import json
+import geopy
+from geopy.geocoders import Nominatim
 from Elena.controller.algorithms import Algorithms
 from Elena.model.graph_model import Model
 
@@ -35,8 +37,33 @@ def create_data(start_location, end_location, x, min_max):
     Prepares the data for the routes to be plotted. 
     """
     global init, G, M, algorithms
-    print("Start: ",start_location)
-    print("End: ",end_location)
+
+    locator = Nominatim(user_agent="myGeocoder")
+    location = locator.reverse(start_location)
+    locate = location.address.split(',')
+    length = len(locate)
+    # if(len(locate) == 9):
+    #     start = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[4] + ',' + \
+    #         locate[6] + ',' + locate[7] + ',' + locate[8]
+    # else:
+    #     start = location
+
+    start = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
+            locate[length-3] + ', USA - ' + locate[length-2] 
+    print("Start: ",start)
+    
+    location = locator.reverse(end_location)
+    locate = location.address.split(',')
+    length = len(locate)
+    # if(len(locate) == 9):
+    #     end = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[4] + ',' + \
+    #         locate[6] + ',' + locate[7] + ',' + locate[8]
+    # else:
+    #     end = location
+    end = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
+            locate[length-3] + ', USA - ' + locate[length-2]
+    print("End: ",end)
+    
     print("Percent of Total path: ",x)
     print("Elevation: ",min_max)
     if not init:
@@ -60,7 +87,9 @@ def create_data(start_location, end_location, x, min_max):
     data = {"shortest_route" : create_geojson(shortestPath[0])}
     data["shortDist"] = shortestPath[1]
     data["gainShort"] = shortestPath[2]
-    data["dropShort"] = shortestPath[3]  
+    data["dropShort"] = shortestPath[3]
+    data["start"] = start
+    data["end"] = end 
     data["popup_flag"] = 2    
     return data
     
