@@ -32,7 +32,7 @@ def create_geojson(coordinates):
 
     return geojson
 
-def create_data(start_location, end_location, x, min_max):
+def create_data(start_location, end_location, x, min_max, log=True):
     """
     Prepares the data for the routes to be plotted. 
     """
@@ -45,7 +45,8 @@ def create_data(start_location, end_location, x, min_max):
 
     start = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
             locate[length-3] + ', USA - ' + locate[length-2] 
-    print("Start: ",start)
+    if log:
+        print("Start: ",start)
     
     location = locator.reverse(end_location)
     locate = location.address.split(',')
@@ -53,17 +54,19 @@ def create_data(start_location, end_location, x, min_max):
 
     end = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
             locate[length-3] + ', USA - ' + locate[length-2]
-    print("End: ",end)
+    if log:
+        print("End: ",end)
     
-    print("Percent of Total path: ",x)
-    print("Elevation: ",min_max)
+    if log:
+        print("Percent of Total path: ",x)
+        print("Elevation: ",min_max)
     if not init:
         M = Model()
         G = M.get_graph(end_location)
         algorithms = Algorithms(G, x = x, mode = min_max)
         init = True
     
-    shortestPath, elevPath = algorithms.shortest_path(start_location, end_location, x, mode = min_max)   
+    shortestPath, elevPath = algorithms.shortest_path(start_location, end_location, x, mode = min_max, log = log)   
     
     if shortestPath is None and elevPath is None:
         data = {"elevation_route" : [] , "shortest_route" : []}        

@@ -145,11 +145,11 @@ class Algorithms:
                     # If minimize, add the elevation difference to the actual distance
                     if mode == "maximize":
                         if weight[0] == 1:
-                            next = length - self.getCost(node, nei, "elevation-diff")
+                            next = length*0.1 - self.getCost(node, nei, "elevation-diff")
                         elif weight[0] == 2:
-                            next = (length - self.getCost(node, nei, "elevation-diff"))*length
+                            next = (length*0.1 - self.getCost(node, nei, "elevation-diff"))*length*0.1
                         elif weight[0] == 3:
-                            next = length + self.getCost(node, nei, "drop-only")
+                            next = length*0.1 + self.getCost(node, nei, "drop-only")
                     else:
                         if weight[0] == 1:
                             next = length*0.1 + self.getCost(node, nei, "elevation-diff")
@@ -194,7 +194,102 @@ class Algorithms:
         
         return
 
-    def shortest_path(self, start_location, end_location, x, mode = "maximize"):
+
+
+    def reconstruct_path(self, cameFrom, current):
+        """
+        Function to retrace the path from end node to start node. Returns in the format required by Mapbox API(for plotting)
+        """
+        if not cameFrom or not current : return
+        total_path = [current]
+        while current in cameFrom:
+            current = cameFrom[current]
+            total_path.append(current)
+        self.best = [total_path[:], self.computeElevs(total_path, "normal"), self.computeElevs(total_path, "gain-only"), \
+                                                                        self.computeElevs(total_path, "drop-only")]
+        return
+
+
+
+    def a_star(self):
+        """
+        Returns the route(list of nodes) that minimize/maximizes change in elevation between start and end using 
+        the A* node, with the heuristic being the distance from the end node. 
+        Params:
+            start_node: source node id
+            end_node: target node id
+            Returns:
+            lat_longs: List of [lon,lat] in the route
+        """
+        
+        if not self.verify_nodes() : return
+        G, shortest = self.G, self.shortest_dist
+        x, mode = self.x, self.mode
+        start_node, end_node = self.start_node, self.end_node
+        
+        #The settotal_path of nodes already evaluated
+        closedSet = set()
+        # The set of currently discovered nodes that are not evaluated yet.
+        # Initially, only the start node is known.        
+        openSet = set()
+        openSet.add(start_node)
+        # For each node, which node it can most efficiently be reached from.
+        # If a node can be reached from many nodes, cameFrom will eventually contain the
+        # most efficient previous step.
+        cameFrom = {}
+        #For each node, the cost of getting from the start node to that node.
+        gScore = {}
+        for node in G.nodes():
+            gScore[node] = float("inf")
+        #The cost of going from start to start is zero.
+        gScore[start_node] = 0 
+
+        gScore1 = {}
+        for node in G.nodes():
+            gScore1[node] = float("inf")
+        #The cost of going from start to start is zero.
+        gScore1[start_node] = 0
+        # For each node, the total cost of getting from the start node to the goal
+        # by passing by that node. That value is partly known, partly heuristic.
+        fScore = {}
+
+        # For the first node, that value is completely heuristic.
+        fScore[start_node] = G.nodes[start_node]['dist_from_dest']*0.1
+        
+        while len(openSet):
+            current = min([(node,fScore[node]) for node in openSet], key=lambda t: t[1])[0]            
+            if current == end_node:
+                self.reconstruct_path(cameFrom, current)
+                return
+            
+            openSet.remove(current)
+            closedSet.add(current)
+            for nei in G.neighbors(current):
+                if nei in closedSet:
+                    continue # Ignore the neighbor which is already evaluated.
+                #The distance from start to a neighbor
+                if mode == "minimize":
+                    tentative_gScore = gScore[current] + self.getCost(current, nei, "gain-only")
+                elif mode == "maximize":
+                    tentative_gScore = gScore[current] + self.getCost(current, nei, "drop-only")
+
+                tentative_gScore1 = gScore1[current] + self.getCost(current, nei, "normal")
+
+                if nei not in openSet and tentative_gScore1<=(1+x)*shortest:# Discover a new node
+                    openSet.add(nei)
+                else: #Stop searching along this path if distance exceed 1.5 times shortest path
+                    if tentative_gScore >= gScore[nei] or tentative_gScore1>=(1+x)*shortest:
+                        continue # This is not a better path.
+
+                cameFrom[nei] = current
+                gScore[nei] = tentative_gScore
+                gScore1[nei] = tentative_gScore1
+                fScore[nei] = gScore[nei] + G.nodes[nei]['dist_from_dest']*0.1
+
+
+
+
+    def shortest_path(self, start_location, end_location, x, mode = "maximize", log=True):
         """
         Function to calculate the shortest path between the start_location and end_location.
         Params:
@@ -237,8 +332,45 @@ class Algorithms:
         # ox.get_route function returns list of edge length for above route
         self.shortest_dist  = sum(ox.get_route_edge_attributes(G, self.shortest_route, 'length'))
         
-        print("dijkstra")
         self.all_dijkstra()
+        dijkstra_route = self.best
+        if log:
+            print("Dijkstra route statistics")
+            print(dijkstra_route[1])
+            print(dijkstra_route[2])
+            print(dijkstra_route[3])
+
+        if mode == "maximize": 
+            self.best = [[], 0.0, float('-inf'), float('-inf')]
+        else:
+            self.best = [[], 0.0, float('inf'), float('-inf')]
+
+        self.a_star()
+        a_star_route = self.best
+        if log:
+            print("A star route statistics")
+            print(a_star_route[1])
+            print(a_star_route[2])
+            print(a_star_route[3])
+
+        if self.mode == "maximize":
+            if (dijkstra_route[2] > a_star_route[2]) or (dijkstra_route[2] == a_star_route[2] and dijkstra_route[1] < a_star_route[1]):
+                self.best = dijkstra_route
+                if log:
+                    print("Dijkstra chosen as best route")
+            else:
+                self.best = a_star_route
+                if log:
+                    print("A star chosen as best route")
+        else:
+            if (dijkstra_route[2] < a_star_route[2]) or (dijkstra_route[2] == a_star_route[2] and dijkstra_route[1] < a_star_route[1]):
+                self.best = dijkstra_route
+                if log:
+                    print("Dijkstra chosen as best route")
+            else:
+                self.best = a_star_route
+                if log:
+                    print("A star chosen as best route")
 
         shortest_route_latlong = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.shortest_route] 
         
