@@ -63,10 +63,10 @@ def create_data(start_location, end_location, x, min_max, log=True):
     if not init:
         M = Model()
         G = M.get_graph(end_location)
-        algorithms = Algorithms(G, x = x, mode = min_max)
+        algorithms = Algorithms(G, x = x, elev_type = min_max)
         init = True
     
-    shortestPath, elevPath = algorithms.shortest_path(start_location, end_location, x, mode = min_max, log = log)   
+    shortestPath, elevPath = algorithms.shortest_path(start_location, end_location, x, elev_type = min_max, log = log)   
     
     if shortestPath is None and elevPath is None:
         data = {"elevation_route" : [] , "shortest_route" : []}        

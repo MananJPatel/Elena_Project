@@ -62,79 +62,79 @@ def test_create_data(start, end, x = 0, min_max = "maximize"):
 
 # Get Cost function
 @return_on_failure("")
-def test_getCost(A, n1 = 0, n2 = 1):
+def test_get_cost(A, n1 = 0, n2 = 1):
     
-    c = A.getCost(0, 1, mode = "normal")
+    c = A.get_cost(0, 1, cost_type = "normal")
     assert isinstance(c, float)
     assert c == 3.0
     
-    c = A.getCost(0, 3, mode = "elevation-diff")
+    c = A.get_cost(0, 3, cost_type = "elevation_difference")
     assert isinstance(c, float)
     assert c == 1.0
 
-    c = A.getCost(5, 4, mode = "elevation-diff")
+    c = A.get_cost(5, 4, cost_type = "elevation_difference")
     assert isinstance(c, float)
     assert c == -2.0
     
-    c = A.getCost(1, 4, mode = "gain-only")
+    c = A.get_cost(1, 4, cost_type= "elevation_gain")
     assert isinstance(c, float)
     assert c == 1.0
 
-    c = A.getCost(4, 1, mode = "gain-only")
+    c = A.get_cost(4, 1, cost_type = "elevation_gain")
     assert isinstance(c, float)
     assert c == 0.0
     
-    c = A.getCost(6, 2, mode = "drop-only")
+    c = A.get_cost(6, 2, cost_type = "elevation_drop")
     assert isinstance(c, float)
     assert c == 4.0
     
-    c = A.getCost(2, 6, mode = "drop-only")
+    c = A.get_cost(2, 6, cost_type = "elevation_drop")
     assert isinstance(c, float)
     assert c == 0.0
 
-    c = A.getCost(2, 6, mode = "abs")
+    c = A.get_cost(2, 6, cost_type = "abs")
     assert isinstance(c, float)
     assert c == 4.0
 
-    c = A.getCost(6, 2, mode = "abs")
+    c = A.get_cost(6, 2, cost_type = "abs")
     assert isinstance(c, float)
     assert c == 4.0
 
 # Get Route
 @return_on_failure("")
-def test_getRoute(A):
-    c = A.getRoute({0 : 1, 1 : 2, 2 : -1}, 0)
+def test_get_route(A):
+    c = A.get_route({0 : 1, 1 : 2, 2 : -1}, 0)
     assert isinstance(c, list)
     assert c == [2, 1, 0]
 
 
 # Compute Elevations
 @return_on_failure("")
-def test_computeElevs(A):
+def test_getElevation(A):
     route = [0, 6, 2]
-    c, p = A.computeElevs(route, mode = "both", piecewise = True)
+    c, p = A.getElevation(route, cost_type = "both", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 0.0
     assert p == [4.0, -4.0]
 
-    c = A.computeElevs(route, mode = "both")
+    c = A.getElevation(route, cost_type = "both")
     assert isinstance(c, float)
     assert c == 0.0
 
-    c, p = A.computeElevs(route, mode = "gain-only", piecewise = True)
+    c, p = A.getElevation(route, cost_type = "elevation_gain", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 4.0
     assert p == [4.0, 0.0]
 
-    c, p = A.computeElevs(route, mode = "drop-only", piecewise = True)
+    c, p = A.getElevation(route, cost_type = "elevation_drop", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 4.0
     assert p == [0.0, 4.0]
 
-    c, p = A.computeElevs(route, mode = "normal", piecewise = True)
+    c, p = A.getElevation(route, cost_type = "normal", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 10.0
@@ -155,12 +155,12 @@ def test_shortest_path():
 
     A = Algorithms(G, x = 100.0)
 
-    sPath, elenavPath = A.shortest_path(start_location, end_location, x, mode = "maximize", log = False)
+    sPath, elenavPath = A.shortest_path(start_location, end_location, x, elev_type = "maximize", log = False)
     assert elenavPath[1] <= (1 + x/100.0)*sPath[1]
     assert elenavPath[2] >= sPath[2]
 
     start_location, end_location = (42.3762, -72.5148), (42.3948, -72.5266)
-    sPath, elenavPath = A.shortest_path(start_location, end_location, x, mode = "minimize", log = False)
+    sPath, elenavPath = A.shortest_path(start_location, end_location, x, elev_type = "minimize", log = False)
     assert elenavPath[1] <= (1 + x/100.0)*sPath[1]
     assert elenavPath[2] <= sPath[2]
 
@@ -191,11 +191,11 @@ if __name__ == "__main__":
     test_create_data(start, end)
     
     # Testing algorithms code
-    print("====>Testing getCost")
-    test_getCost(A)
-    print("====>Testing getRoute")
-    test_getRoute(A)
-    print("====>Testing computeElevs")
-    test_computeElevs(A)
+    print("====>Testing get_cost")
+    test_get_cost(A)
+    print("====>Testing get_route")
+    test_get_route(A)
+    print("====>Testing getElevation")
+    test_getElevation(A)
     print("====>Testing get_shortest_path")
     test_shortest_path()

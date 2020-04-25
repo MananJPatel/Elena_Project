@@ -1,8 +1,8 @@
 import osmnx as ox
 import networkx as nx
+import os
 import numpy as np
 import pickle as p
-import os
 from Elena.abstraction.config import API
 
 class Model:
