@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, '/home/vishnu/Desktop/Masters/Sem2/SE/Elena_Project')
+sys.path.insert(1, sys.path[0][:-5])
 import osmnx as ox
 import networkx as nx
 from Elena.control.settings import *
