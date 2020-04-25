@@ -1,14 +1,16 @@
 import sys
-sys.path.insert(1, sys.path[0][:-5])
 import osmnx as ox
 import networkx as nx
-from Elena.control.settings import *
-from Elena.control.algorithms import *
-from Elena.control.server import create_geojson, create_data
-from Elena.abstraction.graph_model import *
+sys.path.insert(1, sys.path[0][:-5])
 import pickle as p
 import geopy
 from geopy.geocoders import Nominatim
+
+from Elena.abstraction.graph_model import *
+from Elena.control.algorithms import *
+from Elena.control.server import get_geojson, get_data
+from Elena.control.settings import *
+
 
 def return_on_failure(value = ""):
     def decorate(f):
@@ -31,29 +33,28 @@ def test_get_graph(end):
 
 # Create Geojson
 @return_on_failure("")
-def test_create_geojson(location):
-    json = create_geojson(location)
+def test_get_geojson(location):
+    json = get_geojson(location)
     assert isinstance(json, dict)
     assert all(k in ["properties", "type", "geometry"] for k in json.keys())
 
 # Create Data
 @return_on_failure("")
-def test_create_data(start, end, x = 0, min_max = "maximize"):
-    d = create_data(start, end, x, min_max, log=False)
+def test_get_data(start, end, x = 0, min_max = "maximize"):
+    d = get_data(start, end, x, min_max, log=False)
     locator = Nominatim(user_agent="myGeocoder")
     location = locator.reverse(start)
     locate = location.address.split(',')
-    length = len(locate)
 
-    start_loc = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
-            locate[length-3] + ', USA - ' + locate[length-2]
+    len_location = len(locate)
+
+    start_loc = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[len_location-5] + ',' + locate[len_location-3] + ', USA - ' + locate[len_location-2]
 
     location = locator.reverse(end)
     locate = location.address.split(',')
-    length = len(locate)
+    len_location = len(locate)
 
-    end_loc = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[length-5] + ',' + \
-            locate[length-3] + ', USA - ' + locate[length-2]
+    end_loc = locate[0] + ',' + locate[1] + ',' + locate[2] + ',' + locate[len_location-5] + ',' + locate[len_location-3] + ', USA - ' + locate[len_location-2]
 
     assert isinstance(d, dict)
     assert start_loc == d["start"]
@@ -143,7 +144,7 @@ def test_getElevation(A):
 
 # Shortest Path algo
 @return_on_failure("")
-def test_shortest_path():
+def test_get_shortest_path():
     
     #TESTING ALGO CORRECTNESS
     x = 100.0 #in percentage
@@ -155,12 +156,12 @@ def test_shortest_path():
 
     A = Algorithms(G, x = 100.0)
 
-    sPath, elenavPath = A.shortest_path(start_location, end_location, x, elev_type = "maximize", log = False)
+    sPath, elenavPath = A.get_shortest_path(start_location, end_location, x, elev_type = "maximize", log = False)
     assert elenavPath[1] <= (1 + x/100.0)*sPath[1]
     assert elenavPath[2] >= sPath[2]
 
     start_location, end_location = (42.3762, -72.5148), (42.3948, -72.5266)
-    sPath, elenavPath = A.shortest_path(start_location, end_location, x, elev_type = "minimize", log = False)
+    sPath, elenavPath = A.get_shortest_path(start_location, end_location, x, elev_type = "minimize", log = False)
     assert elenavPath[1] <= (1 + x/100.0)*sPath[1]
     assert elenavPath[2] <= sPath[2]
 
@@ -185,10 +186,10 @@ if __name__ == "__main__":
     test_get_graph(end)
 
     # Testing server code
-    print("====>Testing create_geojson")
-    test_create_geojson(start)
-    print("====>Testing create_data")
-    test_create_data(start, end)
+    print("====>Testing get_geojson")
+    test_get_geojson(start)
+    print("====>Testing get_data")
+    test_get_data(start, end)
     
     # Testing algorithms code
     print("====>Testing get_cost")
@@ -198,4 +199,4 @@ if __name__ == "__main__":
     print("====>Testing getElevation")
     test_getElevation(A)
     print("====>Testing get_shortest_path")
-    test_shortest_path()
+    test_get_shortest_path()

@@ -10,7 +10,8 @@ class Algorithms:
         self.elev_type = elev_type
         self.x = x
         self.best = [[], 0.0, float('-inf'), 0.0]
-        self.start_node, self.end_node = None, None
+        self.start_node= None
+        self.end_node =None
 
     def reload(self, G):
         # Reinitialize with modified G
@@ -137,14 +138,14 @@ class Algorithms:
         
         return None, None, None
 
-    def all_dijkstra(self):
+    def bestDijkstra(self):
         # dijkstra with different weighing criteria for differnt edges
         if not self.check_nodes() : 
             return
 
         start_node, end_node = self.start_node, self.end_node
         
-        for weight in [[1, True], [2, True], [3, True], [1, False], [2, False], [3, False]]:
+        for weight in [[1, True], [1, False], [2, True], [2, False], [3, True], [3, False]]:
             _, curr_distance, parent_node = self.dijkstra(weight)
             
             if not curr_distance : 
@@ -171,8 +172,7 @@ class Algorithms:
             curr_node = from_node[curr_node]
             total.append(curr_node)
         
-        self.best = [total[:], self.getElevation(total, "normal"), self.getElevation(total, "elevation_gain"), \
-                                                                        self.getElevation(total, "elevation_drop")]
+        self.best = [total[:], self.getElevation(total, "normal"), self.getElevation(total, "elevation_gain"), self.getElevation(total, "elevation_drop")]
         return
 
 
@@ -239,7 +239,7 @@ class Algorithms:
 
 
 
-    def shortest_path(self, startpt, endpt, x, elev_type = "maximize", log=True):
+    def get_shortest_path(self, startpt, endpt, x, elev_type = "maximize", log=True):
         
         # Calculates shortest path
         G = self.G
@@ -263,7 +263,7 @@ class Algorithms:
         # ox.get_route function returns list of edge length for above route
         self.shortest_dist  = sum(ox.get_route_edge_attributes(G, self.shortest_route, 'length'))
         
-        self.all_dijkstra()
+        self.bestDijkstra()
         dijkstra_route = self.best
         if log:
             print("Dijkstra route statistics")
