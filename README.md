@@ -37,7 +37,7 @@ Also verify that other dependencies mentioned in "requirements.txt" are installe
 - ```./start``` To start up the application. 
 - Head over to `http://127.0.0.1:5000/mapbox_gl_new` on preferably Google Chrome to use the web interface.
 
-![EleNa Interface](home_page.PNG "Interface")
+![EleNa Interface](home-page.png)
 
 - The user clicks on the map to set the start and end point.
 - The user also sets the percentage of shortest distance that they are willing to go extra and whether they want to minimize or maximize elevation.
