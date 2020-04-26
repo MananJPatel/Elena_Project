@@ -1,0 +1,69 @@
+Start:  University of Massachusetts Amherst, Stockbridge Road, North Amherst, Amherst, Massachusetts, USA -  01003
+End:  Gulliver Meadow Conservation Area, Strong Street, East Village, Amherst, Massachusetts, USA -  01002
+Percent of Total path:  10
+Elevation:  minimize
+Model Initialized
+Loaded Graph
+Dijkstra route statistics
+1870.4080000000001
+65.311
+28.388000000000005
+A star route statistics
+0.0
+inf
+-inf
+
+####
+###picture saved####
+Dijkstra chosen as best route
+127.0.0.1 - - [24/Apr/2020 20:45:45] "POST /route HTTP/1.1" 200 -
+Start:  University of Massachusetts Amherst, Stockbridge Road, North Amherst, Amherst, Massachusetts, USA -  01003
+End:  8, Hedgerow Lane, East Village, Amherst, Massachusetts, USA -  01002
+Percent of Total path:  10
+Elevation:  minimize
+Dijkstra route statistics
+2911.968
+31.12400000000001
+41.25000000000001
+A star route statistics
+0.0
+inf
+-inf
+Dijkstra chosen as best route
+
+
+#######A* best route #############################
+127.0.0.1 - - [24/Apr/2020 21:00:56] "POST /route HTTP/1.1" 200 -
+Start:  MA 116, North Amherst, Amherst, Amherst, Massachusetts, USA -  01003
+End:  Lot 52 Red Permit, Butterfield Terrace, North Amherst, Amherst, Massachusetts, USA -  01003
+Percent of Total path:  15
+Elevation:  minimize
+Dijkstra route statistics
+3495.0079999999994
+42.016000000000005
+6.954000000000001
+A star route statistics
+3604.5409999999997
+5.905000000000008
+40.96700000000001
+A star chosen as best route
+127.0.0.1 - - [24/Apr/2020 21:01:14] "PO
+
+
+###### Dijkstr's algorithm##############
+Start:  16, Juggler Meadow Road, Leverett Station, Leverett, Massachusetts, USA -  01375
+End:  Upper Mill River Conservation Area, East Leverett Road, Pioneer Valley Cohousing, Amherst, Massachusetts, USA -  01054
+Percent of Total path:  20
+Elevation:  maximize
+Dijkstra route statistics
+3764.4209999999994
+46.338999999999984
+52.36499999999998
+A star route statistics
+3656.511
+44.85199999999999
+38.82599999999999
+Dijkstra chosen as best route
+
+
+
