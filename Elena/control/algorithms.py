@@ -1,7 +1,6 @@
 import osmnx as ox
 import networkx as nx
 from heapq import *
-import matplotlib.pyplot as plt
 from collections import deque, defaultdict
 
 class Algorithms:
