@@ -83,7 +83,7 @@ class Algorithms:
 
 
     # Run the dijkstra algorithm
-    def dijkstra(self, weight):
+    def dijkstra(self):
         #Implements Dijkstra's Algorithm
         
         if not self.check_nodes() : 
@@ -103,7 +103,7 @@ class Algorithms:
             if curr_node not in seen:
                 seen.add(curr_node)
                 if curr_node == end_node:
-                    return curr_priority, curr_distance, parent_node
+                    break
 
                 for n in G.neighbors(curr_node):
                     if n in seen: 
@@ -114,54 +114,29 @@ class Algorithms:
                     
                     # Update distance btw the nodes depending on maximize(subtract) or minimize elevation(add)
                     if elev_type == "maximize":
-                        if weight[0] == 1:
+                        if x <= 0.5:
                             nxt = edge_len*0.1 - self.get_cost(curr_node, n, "elevation_difference")
-                        elif weight[0] == 2:
+                        else:
                             nxt = (edge_len*0.1 - self.get_cost(curr_node, n, "elevation_difference"))* edge_len*0.1
-                        elif weight[0] == 3:
-                            nxt = edge_len*0.1 + self.get_cost(curr_node, n, "elevation_drop")
                     else:
-                        if weight[0] == 1:
-                            nxt = edge_len*0.1 + self.get_cost(curr_node, n, "elevation_difference")
-                        elif weight[0] == 2:
-                            nxt = (edge_len*0.1 + self.get_cost(curr_node, n, "elevation_difference"))*edge_len*0.1 
-                        else: 
-                            nxt = edge_len*0.1 + self.get_cost(curr_node, n, "elevation_gain")
-
-                    if weight[1]: #whethr to consider next node priority
+                        nxt = edge_len*0.1 + self.get_cost(curr_node, n, "elevation_gain")
                         nxt += curr_priority
+                    
                     nxt_distance = curr_distance + edge_len
+                    
                     if nxt_distance <= shortest*(1.0+x) and (prev is None or nxt < prev):
                         parent_node[n] = curr_node
                         prior_info[n] = nxt
                         heappush(temp, (nxt, nxt_distance, n))        
         
-        return None, None, None
-
-    def bestDijkstra(self):
-        # dijkstra with different weighing criteria for differnt edges
-        if not self.check_nodes() : 
+        if not curr_distance : 
             return
 
-        start_node, end_node = self.start_node, self.end_node
-        
-        for weight in [[1, True], [1, False], [2, True], [2, False], [3, True], [3, False]]:
-            _, curr_distance, parent_node = self.dijkstra(weight)
-            
-            if not curr_distance : 
-                continue
-            
-            route = self.get_route(parent_node, end_node)
-            elevation_dist, dropDist = self.getElevation(route, "elevation_gain"), self.getElevation(route, "elevation_drop")            
-            if self.elev_type == "maximize":
-                if (elevation_dist > self.best[2]) or (elevation_dist == self.best[2] and curr_distance < self.best[1]):
-                    self.best = [route[:], curr_distance, elevation_dist, dropDist]
-            else:
-                if (elevation_dist < self.best[2]) or (elevation_dist == self.best[2] and curr_distance < self.best[1]):
-                    self.best = [route[:], curr_distance,  elevation_dist, dropDist]
-        
-        return 
+        route = self.get_route(parent_node, end_node)
+        elevation_dist, dropDist = self.getElevation(route, "elevation_gain"), self.getElevation(route, "elevation_drop")
+        self.best = [route[:], curr_distance, elevation_dist, dropDist]
 
+        return
 
 
     def retrace_path(self, from_node, curr_node):
@@ -263,7 +238,7 @@ class Algorithms:
         # ox.get_route function returns list of edge length for above route
         self.shortest_dist  = sum(ox.get_route_edge_attributes(G, self.shortest_route, 'length'))
         
-        self.bestDijkstra()
+        self.dijkstra()
         dijkstra_route = self.best
         if log:
             print("Dijkstra route statistics")

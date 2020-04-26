@@ -16,16 +16,18 @@ def Test(value = ""):
         def condition(*args, **kwargs):
             try:
                 function(*args,**kwargs)
-                print("Passed :)!" ) # if a condition passes
+                print("Passed :)" ) # if a condition passes
+                print()
             except Exception as error:
                 print(error)
-                print("Failed :(!") # if a condition failed
+                print("Failed :(") # if a condition failed
+                print()
         return condition
     return temp
 
 @Test("")
 def test_get_graph(end):
-    print("#Testing the get_graph method in graph_model.py(Abstraction)......")
+    print("# Testing the get_graph method in graph_model.py(Abstraction)......")
 
     model = Model()
     G = model.get_graph(end)
@@ -33,7 +35,7 @@ def test_get_graph(end):
 
 @Test("")
 def test_get_route(A):
-    print("#Testing get_route method in algorithms.py(control)....")
+    print("# Testing get_route method in algorithms.py(control)....")
 
     c = A.get_route({0 : 1, 1 : 2, 2 : -1}, 0)
     assert isinstance(c, list)
@@ -43,7 +45,7 @@ def test_get_route(A):
 @Test("")
 def test_get_shortest_path():
 
-    print("#Testing get_shortest_path method in algorithms.py(control)......") 
+    print("# Testing get_shortest_path method in algorithms.py(control)......") 
     x = 100.0 
     
     startpt=(42.3762, -72.5148)
@@ -66,14 +68,14 @@ def test_get_shortest_path():
 
 @Test("")
 def test_getElevation(A):
-    print("#Testing getElevation method in algorithms.py(control)....")
+    print("# Testing getElevation method in algorithms.py(control)....")
 
-    route = [0, 6, 2]
+    route = [0, 3, 4, 2]
     c, p = A.getElevation(route, cost_type = "both", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 0.0
-    assert p == [4.0, -4.0]
+    assert p == [1.0, 0.0, -1.0]
 
     c = A.getElevation(route, cost_type = "both")
     assert isinstance(c, float)
@@ -82,25 +84,25 @@ def test_getElevation(A):
     c, p = A.getElevation(route, cost_type = "elevation_gain", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
-    assert c == 4.0
-    assert p == [4.0, 0.0]
+    assert c == 1.0
+    assert p == [1.0, 0.0, 0.0]
 
     c, p = A.getElevation(route, cost_type = "elevation_drop", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
-    assert c == 4.0
-    assert p == [0.0, 4.0]
+    assert c == 1.0
+    assert p == [0.0, 0.0, 1.0]
 
     c, p = A.getElevation(route, cost_type = "normal", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
-    assert c == 10.0
-    assert p == [5.0, 5.0]
+    assert c == 6.726999999999999
+    assert p == [1.414, 4.0, 1.313]
 
 
 @Test("")
 def test_get_cost(A, n1 = 0, n2 = 1):
-    print("#Testing get_cost method in algorithms.py(control)....")
+    print("# Testing get_cost method in algorithms.py(control)....")
 
     c = A.get_cost(0, 1, cost_type = "normal")
     assert isinstance(c, float)
@@ -140,7 +142,7 @@ def test_get_cost(A, n1 = 0, n2 = 1):
 
 @Test("")
 def test_get_geojson(location):
-    print("#Testing get_geojson method in server.py(control)....")
+    print("# Testing get_geojson method in server.py(control)....")
 
     json = get_geojson(location)
     assert isinstance(json, dict)
@@ -148,7 +150,7 @@ def test_get_geojson(location):
 
 @Test("")
 def test_get_data(start, end, x = 0, min_max = "maximize"):
-    print("#Testing get_data method in server.py(control).....")
+    print("# Testing get_data method in server.py(control).....")
 
     d = get_data(start, end, x, min_max, log=False)
     locator = Nominatim(user_agent="myGeocoder")
