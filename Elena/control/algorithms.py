@@ -241,6 +241,7 @@ class Algorithms:
         self.dijkstra()
         dijkstra_route = self.best
         if log:
+            print()
             print("Dijkstra route statistics")
             print(dijkstra_route[1])
             print(dijkstra_route[2])
@@ -254,29 +255,35 @@ class Algorithms:
         self.a_star()
         a_star_route = self.best
         if log:
+            print()
             print("A star route statistics")
             print(a_star_route[1])
             print(a_star_route[2])
             print(a_star_route[3])
+            print()
 
         if self.elev_type == "maximize":
             if (dijkstra_route[2] > a_star_route[2]) or (dijkstra_route[2] == a_star_route[2] and dijkstra_route[1] < a_star_route[1]):
                 self.best = dijkstra_route
                 if log:
                     print("Dijkstra chosen as best route")
+                    print()
             else:
                 self.best = a_star_route
                 if log:
                     print("A star chosen as best route")
+                    print()
         else:
             if (dijkstra_route[2] < a_star_route[2]) or (dijkstra_route[2] == a_star_route[2] and dijkstra_route[1] < a_star_route[1]):
                 self.best = dijkstra_route
                 if log:
                     print("Dijkstra chosen as best route")
+                    print()
             else:
                 self.best = a_star_route
                 if log:
                     print("A star chosen as best route")
+                    print()
 
         shortest_route_latlong = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.shortest_route] 
         
