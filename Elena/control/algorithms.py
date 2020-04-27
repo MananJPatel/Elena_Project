@@ -40,7 +40,7 @@ class Algorithms:
         
 
 
-    def getElevation(self, route, cost_type = "both", isPiecewise = False):
+    def get_Elevation(self, route, cost_type = "both", isPiecewise = False):
         # Compute total cost or piecewise cost for a given route
         total = 0
         if isPiecewise : 
@@ -133,7 +133,7 @@ class Algorithms:
             return
 
         route = self.get_route(parent_node, end_node)
-        elevation_dist, dropDist = self.getElevation(route, "elevation_gain"), self.getElevation(route, "elevation_drop")
+        elevation_dist, dropDist = self.get_Elevation(route, "elevation_gain"), self.get_Elevation(route, "elevation_drop")
         self.best = [route[:], curr_distance, elevation_dist, dropDist]
 
         return
@@ -147,7 +147,7 @@ class Algorithms:
             curr_node = from_node[curr_node]
             total.append(curr_node)
         
-        self.best = [total[:], self.getElevation(total, "normal"), self.getElevation(total, "elevation_gain"), self.getElevation(total, "elevation_drop")]
+        self.best = [total[:], self.get_Elevation(total, "normal"), self.get_Elevation(total, "elevation_gain"), self.get_Elevation(total, "elevation_drop")]
         return
 
 
@@ -288,7 +288,7 @@ class Algorithms:
         shortest_route_latlong = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.shortest_route] 
         
         shortestPathStats = [shortest_route_latlong, self.shortest_dist, \
-                            self.getElevation(self.shortest_route, "elevation_gain"), self.getElevation(self.shortest_route, "elevation_drop")]
+                            self.get_Elevation(self.shortest_route, "elevation_gain"), self.get_Elevation(self.shortest_route, "elevation_drop")]
 
         # If dijkstra doesn't return a shortest path based on elevation requirements
         if (self.elev_type == "maximize" and self.best[2] == float('-inf')) or (self.elev_type == "minimize" and self.best[3] == float('-inf')):            

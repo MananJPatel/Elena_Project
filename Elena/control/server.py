@@ -6,6 +6,7 @@ from geopy.geocoders import Nominatim
 import json
 from Elena.abstraction.graph_model import Model
 from Elena.control.algorithms import Algorithms
+from Elena.control.settings import *
 
 
 app = Flask(__name__, static_url_path = '', static_folder = "../presentation/static", template_folder = "../presentation/templates")
@@ -13,8 +14,7 @@ app.config.from_object(__name__)
 
 app.config.from_envvar('APP_CONFIG_FILE', silent=True)
 
-MAPBOX_ACCESS_KEY = 'pk.eyJ1Ijoia2V2aW5qb3NlcGgxOTk1IiwiYSI6ImNqbzUxc2kwaDAybm4zanRjdm9mbndqZW8ifQ.wdJv5gB84BWVy1dAoNN6ew'
-ROUTE_URL = "https://api.mapbox.com/directions/v5/mapbox/driving/{0}.json?access_token={1}&overview=full&geometries=geojson"
+MAPBOX_ACCESS_KEY = MAPBOX_KEY
 
 init = False
 G, M, algorithms = None, None, None

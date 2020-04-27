@@ -67,33 +67,33 @@ def test_get_shortest_path():
     assert best_path[2] <= shortest_path[2]
 
 @Test("")
-def test_getElevation(A):
-    print("# Testing getElevation method in algorithms.py(control)....")
+def test_get_Elevation(A):
+    print("# Testing get_Elevation method in algorithms.py(control)....")
 
     route = [0, 3, 4, 2]
-    c, p = A.getElevation(route, cost_type = "both", isPiecewise = True)
+    c, p = A.get_Elevation(route, cost_type = "both", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 0.0
     assert p == [1.0, 0.0, -1.0]
 
-    c = A.getElevation(route, cost_type = "both")
+    c = A.get_Elevation(route, cost_type = "both")
     assert isinstance(c, float)
     assert c == 0.0
 
-    c, p = A.getElevation(route, cost_type = "elevation_gain", isPiecewise = True)
+    c, p = A.get_Elevation(route, cost_type = "elevation_gain", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 1.0
     assert p == [1.0, 0.0, 0.0]
 
-    c, p = A.getElevation(route, cost_type = "elevation_drop", isPiecewise = True)
+    c, p = A.get_Elevation(route, cost_type = "elevation_drop", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 1.0
     assert p == [0.0, 0.0, 1.0]
 
-    c, p = A.getElevation(route, cost_type = "normal", isPiecewise = True)
+    c, p = A.get_Elevation(route, cost_type = "normal", isPiecewise = True)
     assert isinstance(c, float)
     assert isinstance(p, list)
     assert c == 6.726999999999999
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     test_get_graph(end)
     test_get_route(A)
     test_get_shortest_path()
-    test_getElevation(A)
+    test_get_Elevation(A)
     test_get_cost(A)
     test_get_geojson(start)
     test_get_data(start, end)
