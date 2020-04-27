@@ -4,7 +4,7 @@ import geopy
 from flask import Flask, jsonify, session, g, request, url_for, flash, redirect,abort,render_template
 from geopy.geocoders import Nominatim
 import json
-from Elena.abstraction.graph_model import Model
+from Elena.abstraction.abstraction import Model
 from Elena.control.algorithms import Algorithms
 from Elena.control.settings import *
 

@@ -6,7 +6,7 @@ import pickle as p
 import geopy
 from geopy.geocoders import Nominatim
 
-from Elena.abstraction.graph_model import *
+from Elena.abstraction.abstraction import *
 from Elena.control.algorithms import *
 from Elena.control.server import get_geojson, get_data
 from Elena.control.settings import *
@@ -27,7 +27,7 @@ def Test(value = ""):
 
 @Test("")
 def test_get_graph(end):
-    print("# Testing the get_graph method in graph_model.py(Abstraction)......")
+    print("# Testing the get_graph method in abstraction.py(Abstraction)......")
 
     model = Model()
     G = model.get_graph(end)
