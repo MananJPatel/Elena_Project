@@ -115,7 +115,8 @@ class Algorithms:
                     # Update distance btw the nodes depending on maximize(subtract) or minimize elevation(add)
                     if elev_type == "maximize":
                         if x <= 0.5:
-                            nxt = edge_len*0.1 - self.get_cost(curr_node, n, "elevation_difference")
+                            nxt = edge_len*0.1 + self.get_cost(curr_node, n, "elevation_drop")
+                            nxt += curr_priority
                         else:
                             nxt = (edge_len*0.1 - self.get_cost(curr_node, n, "elevation_difference"))* edge_len*0.1
                     else:

@@ -6,9 +6,9 @@ import pickle as p
 import geopy
 from geopy.geocoders import Nominatim
 
-from Elena.abstraction.graph_model import *
+from Elena.abstraction.abstraction import *
 from Elena.control.algorithms import *
-from Elena.control.server import get_geojson, get_data
+from Elena.control.control import get_geojson, get_data
 from Elena.control.settings import *
 
 def Test(value = ""):

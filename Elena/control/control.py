@@ -4,7 +4,7 @@ import geopy
 from flask import Flask, jsonify, session, g, request, url_for, flash, redirect,abort,render_template
 from geopy.geocoders import Nominatim
 import json
-from Elena.abstraction.graph_model import Model
+from Elena.abstraction.abstraction import Model
 from Elena.control.algorithms import Algorithms
 from Elena.control.settings import *
 
@@ -88,11 +88,11 @@ def get_data(startpt, endpt, x, min_max, log=True):
         data["popup_flag"] = 2    
     return data
     
-@app.route('/mapbox_gl_new')
+@app.route('/presentation')
 def mapbox_gl_new():    
 
     return render_template(
-        'mapbox_gl_new.html', 
+        'presentation.html', 
         ACCESS_KEY=MAPBOX_ACCESS_KEY
     )
 
