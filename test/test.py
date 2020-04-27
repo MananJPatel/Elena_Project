@@ -27,7 +27,7 @@ def Test(value = ""):
 
 @Test("")
 def test_get_graph(end):
-    print("# Testing the get_graph method in graph_model.py(Abstraction)......")
+    print("# Testing the get_graph method in abstraction.py(Abstraction)......")
 
     model = Model()
     G = model.get_graph(end)
@@ -142,7 +142,7 @@ def test_get_cost(A, n1 = 0, n2 = 1):
 
 @Test("")
 def test_get_geojson(location):
-    print("# Testing get_geojson method in server.py(control)....")
+    print("# Testing get_geojson method in control.py(control)....")
 
     json = get_geojson(location)
     assert isinstance(json, dict)
@@ -150,7 +150,7 @@ def test_get_geojson(location):
 
 @Test("")
 def test_get_data(start, end, x = 100, min_max = "maximize"):
-    print("# Testing get_data method in server.py(control).....")
+    print("# Testing get_data method in control.py(control).....")
 
     d = get_data(start, end, x, min_max, log=False)
     locator = Nominatim(user_agent="myGeocoder")
