@@ -35,7 +35,7 @@ Also verify that other dependencies mentioned in "requirements.txt" are installe
 ### Using the application
 - Make `start` an executable by running `chmod +x start`
 - ```./start``` To start up the application. 
-- Head over to `http://127.0.0.1:5000/mapbox_gl_new` on preferably Google Chrome to use the web interface.
+- Head over to `http://127.0.0.1:5000/presentation` on preferably Google Chrome to use the web interface.
 
 ![EleNa Interface](home-page.png)
 
