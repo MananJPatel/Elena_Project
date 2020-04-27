@@ -238,6 +238,15 @@ class Algorithms:
         # ox.get_route function returns list of edge length for above route
         self.shortest_dist  = sum(ox.get_route_edge_attributes(G, self.shortest_route, 'length'))
         
+        shortest_route_latlong = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.shortest_route] 
+        
+        shortestPathStats = [shortest_route_latlong, self.shortest_dist, \
+                            self.get_Elevation(self.shortest_route, "elevation_gain"), self.get_Elevation(self.shortest_route, "elevation_drop")]
+
+        
+        if(x == 0):
+            return shortestPathStats, shortestPathStats
+
         self.dijkstra()
         dijkstra_route = self.best
         if log:
@@ -285,12 +294,7 @@ class Algorithms:
                     print("A star chosen as best route")
                     print()
 
-        shortest_route_latlong = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.shortest_route] 
-        
-        shortestPathStats = [shortest_route_latlong, self.shortest_dist, \
-                            self.get_Elevation(self.shortest_route, "elevation_gain"), self.get_Elevation(self.shortest_route, "elevation_drop")]
-
-        # If dijkstra doesn't return a shortest path based on elevation requirements
+        # If dijkstra or A-star doesn't return a shortest path based on elevation requirements
         if (self.elev_type == "maximize" and self.best[2] == float('-inf')) or (self.elev_type == "minimize" and self.best[3] == float('-inf')):            
             return shortestPathStats, [[], 0.0, 0, 0]
         

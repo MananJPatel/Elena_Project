@@ -149,7 +149,7 @@ def test_get_geojson(location):
     assert all(k in ["properties", "type", "geometry"] for k in json.keys())
 
 @Test("")
-def test_get_data(start, end, x = 0, min_max = "maximize"):
+def test_get_data(start, end, x = 100, min_max = "maximize"):
     print("# Testing get_data method in server.py(control).....")
 
     d = get_data(start, end, x, min_max, log=False)
