@@ -2,6 +2,7 @@ import osmnx as ox
 import networkx as nx
 from collections import deque, defaultdict
 from heapq import *
+import time
 
 class Algorithms:
     def __init__(self, G, x = 0.0, elev_type = "maximize"):
@@ -248,7 +249,9 @@ class Algorithms:
         if(x == 0):
             return shortestPathStats, shortestPathStats
 
+        start_time = time.time()
         self.dijkstra()
+        end_time = time.time()
         dijkstra_route = self.best
         if log:
             print()
@@ -256,13 +259,16 @@ class Algorithms:
             print(dijkstra_route[1])
             print(dijkstra_route[2])
             print(dijkstra_route[3])
+            print("--- Time taken = %s seconds ---" % (end_time - start_time))
 
         if elev_type == "maximize": 
             self.best = [[], 0.0, float('-inf'), float('-inf')]
         else:
             self.best = [[], 0.0, float('inf'), float('-inf')]
 
+        start_time = time.time()
         self.a_star()
+        end_time = time.time()
         a_star_route = self.best
         if log:
             print()
@@ -270,6 +276,8 @@ class Algorithms:
             print(a_star_route[1])
             print(a_star_route[2])
             print(a_star_route[3])
+            print("--- Time taken = %s seconds ---" % (end_time - start_time))
+
             print()
 
         if self.elev_type == "maximize":
