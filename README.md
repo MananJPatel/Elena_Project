@@ -33,6 +33,7 @@ Also verify that other dependencies mentioned in "requirements.txt" are installe
 # Running and testing the application
 
 ### Using the application
+- Clone the git repository from `https://github.com/vishnubalakrishnan/Elena_Project.git`
 - Make `start` an executable by running `chmod +x start`
 - ```./start``` To start up the application. 
 - Head over to `http://127.0.0.1:5000/presentation` on preferably Google Chrome to use the web interface.
