@@ -89,7 +89,7 @@ def get_data(startpt, endpt, x, min_max, log=True):
     return data
     
 @app.route('/presentation')
-def mapbox_gl_new():    
+def presentation():    
 
     return render_template(
         'presentation.html', 
