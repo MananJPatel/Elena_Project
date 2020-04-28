@@ -299,6 +299,10 @@ class Algorithms:
         if (self.elev_type == "maximize" and self.best[2] == float('-inf')) or (self.elev_type == "minimize" and self.best[3] == float('-inf')):            
             return shortestPathStats, [[], 0.0, 0, 0]
         
-        self.best[0] = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.best[0]] 
+        self.best[0] = [[G.nodes[route_node]['x'],G.nodes[route_node]['y']] for route_node in self.best[0]]
+
+        # If the elevation path does not match the elevation requirements
+        if((self.elev_type == "maximize" and self.best[2] < shortestPathStats[2]) or (self.elev_type == "minimize" and self.best[2] > shortestPathStats[2])):
+            self.best = shortestPathStats
 
         return shortestPathStats, self.best
