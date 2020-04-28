@@ -4,7 +4,7 @@ import geopy
 from flask import Flask, jsonify, session, g, request, url_for, flash, redirect,abort,render_template
 from geopy.geocoders import Nominatim
 import json
-from Elena.abstraction.abstraction import Model
+from Elena.abstraction.abstraction import Graph_Abstraction
 from Elena.control.algorithms import Algorithms
 from Elena.control.settings import *
 
@@ -56,8 +56,8 @@ def get_data(startpt, endpt, x, min_max, log=True):
         print("Percent of Total path: ",x)
         print("Elevation: ",min_max)
     if not init:
-        M = Model()
-        G = M.get_graph(endpt)
+        abstract = Graph_Abstraction()
+        G = abstract.get_graph(endpt)
         algorithms = Algorithms(G, x = x, elev_type = min_max)
         init = True
     

@@ -5,7 +5,7 @@ import numpy as np
 import pickle as p
 from Elena.abstraction.config import API
 
-class Model:
+class Graph_Abstraction:
     def __init__(self):
         print("Initializing the model")        
         self.GOOGLEAPIKEY=API["googleapikey"]        

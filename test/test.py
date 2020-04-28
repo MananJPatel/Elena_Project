@@ -29,8 +29,8 @@ def Test(value = ""):
 def test_get_graph(end):
     print("# Testing the get_graph method in abstraction.py(Abstraction)......")
 
-    model = Model()
-    G = model.get_graph(end)
+    abstract = Graph_Abstraction()
+    G = abstract.get_graph(end)
     assert isinstance(G, nx.classes.multidigraph.MultiDiGraph)
 
 @Test("")
@@ -51,8 +51,8 @@ def test_get_shortest_path():
     startpt=(42.3762, -72.5148)
     endpt =(42.3948, -72.5266)
 
-    model = Model()
-    G = model.get_graph(endpt)
+    abstract = Graph_Abstraction()
+    G = abstract.get_graph(endpt)
 
     A = Algorithms(G, x = 100.0)
 
